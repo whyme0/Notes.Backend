@@ -22,7 +22,7 @@ namespace Notes.Application.Commands
                 throw new NotFoundException(nameof(Note), request.Id);
             }
             
-            _dbContext.Notes.RemoveAsync(note);
+            _dbContext.Notes.Remove(note);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
