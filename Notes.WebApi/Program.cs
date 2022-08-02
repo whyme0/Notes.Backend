@@ -2,7 +2,9 @@ using System.Reflection;
 using Notes.Persistence;
 using Notes.Application.Common.Mappings;
 using Notes.Application.Interfaces;
+using Notes.WebApi.Middleware;
 using Notes.Application;
+using Notes.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseCustomExceptionHandler();
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
