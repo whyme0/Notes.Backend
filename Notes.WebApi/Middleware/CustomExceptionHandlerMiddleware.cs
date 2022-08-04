@@ -30,7 +30,7 @@ namespace Notes.WebApi.Middleware
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             int code;
-            string result = string.Empty;
+            string? result = null;
             switch (exception)
             {
                 case ValidationException validationException:
@@ -46,10 +46,7 @@ namespace Notes.WebApi.Middleware
             }
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = code;
-            if (result == string.Empty)
-            {
-                result = JsonSerializer.Serialize(new { error = exception.Message });
-            }
+            result ??= JsonSerializer.Serialize(new { error = exception.Message });
             return context.Response.WriteAsync(result);
         }
     }
