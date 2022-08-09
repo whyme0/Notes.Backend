@@ -16,12 +16,6 @@ namespace Notes.WebApi.Controllers
             _mapper = mapper;
         }
 
-        [Route("test-route")]
-        public IActionResult TestRoute()
-        {
-            return Content("test-route works");
-        }
-
         [HttpGet]
         public async Task<ActionResult<NoteListDTO>> GetAll()
         {
@@ -29,7 +23,7 @@ namespace Notes.WebApi.Controllers
             var query = new GetNoteListQuery()
             {
                 UserId = UserId
-            };
+            }; 
             var notes = await Mediator!.Send(query);
             Console.WriteLine("After");
             return Ok(notes);
