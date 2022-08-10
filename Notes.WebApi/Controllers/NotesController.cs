@@ -47,7 +47,7 @@ namespace Notes.WebApi.Controllers
             var command = _mapper.Map<CreateNoteCommand>(createNoteDTO);
             command.UserId = UserId;
             var noteId = await Mediator!.Send(command);
-            return StatusCode(StatusCodes.Status201Created);
+            return StatusCode(StatusCodes.Status201Created, noteId);
         }
 
         [HttpPut]
