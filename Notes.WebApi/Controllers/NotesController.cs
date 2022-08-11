@@ -3,10 +3,12 @@ using Notes.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 using Notes.WebApi.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Notes.WebApi.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class NotesController : ControllerBase
     {
         private readonly IMapper _mapper;
