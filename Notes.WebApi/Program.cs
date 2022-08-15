@@ -20,6 +20,14 @@ builder.Services.AddApplication();
 // Add database services
 builder.Services.AddPersistence(builder.Configuration);
 
+// Add Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPathStr = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPathStr);
+});
+
 // Adding CORS
 builder.Services.AddCors(o =>
 {
@@ -68,6 +76,12 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.RoutePrefix = string.Empty;
+    c.SwaggerEndpoint("swagger/v1/swagger.json", "Notes API");
+});
 
 app.UseEndpoints(endpoints =>
 {
