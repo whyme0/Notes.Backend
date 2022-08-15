@@ -17,12 +17,10 @@ namespace Notes.WebApi.Middleware
         {
             try
             {
-                Console.WriteLine("try _next delegate");
                 await _next(context);
             }
             catch (Exception e)
             {
-                Console.WriteLine("oops... an error!");
                 await HandleExceptionAsync(context, e);
             }
         }
