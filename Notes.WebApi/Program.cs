@@ -5,6 +5,9 @@ using Notes.Application.Interfaces;
 using Notes.Application;
 using Notes.WebApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,13 +23,15 @@ builder.Services.AddApplication();
 // Add database services
 builder.Services.AddPersistence(builder.Configuration);
 
-// Add Swagger
-builder.Services.AddSwaggerGen(c =>
+// Add Swagger and api versioning
+builder.Services.AddVersionedApiExplorer(o =>
 {
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPathStr = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPathStr);
+    o.GroupNameFormat = "'v'VVV";
 });
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>,
+                    ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen();
+builder.Services.AddApiVersioning();
 
 // Adding CORS
 builder.Services.AddCors(o =>
@@ -77,15 +82,27 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+using (var scope = app.Services.CreateScope())
 {
-    c.RoutePrefix = string.Empty;
-    c.SwaggerEndpoint("swagger/v1/swagger.json", "Notes API");
-});
+    var provider = scope.ServiceProvider;
+    var apiVersionDescriptions = provider.GetRequiredService<IApiVersionDescriptionProvider>().ApiVersionDescriptions;
+    app.UseSwaggerUI(c =>
+    {
+        foreach (var description in apiVersionDescriptions)
+        {
+            c.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+            c.RoutePrefix = string.Empty;
+        }
+    });
+}
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+app.UseApiVersioning();
 
 app.Run();
