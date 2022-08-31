@@ -1,4 +1,5 @@
 using System.Reflection;
+using Serilog;
 using Notes.Persistence;
 using Notes.Application.Common.Mappings;
 using Notes.Application.Interfaces;
@@ -8,8 +9,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Notes.WebApi.Services;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File(
+        "NotesWebAPILogs-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
 
 builder.Services.AddAutoMapper(config => 
 {
@@ -32,6 +43,10 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>,
                     ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApiVersioning();
+
+// User service
+builder.Services.AddSingleton<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 
 // Adding CORS
 builder.Services.AddCors(o =>
@@ -70,8 +85,9 @@ using (var scope = app.Services.CreateScope())
         var context = serviceProvider.GetRequiredService<NotesDbContext>();
         DbInitializer.Initialize(context);
     }
-    catch
+    catch(Exception ex)
     {
+        Log.Fatal(ex, "An error occurred while app initialization");
     }
 }
 
