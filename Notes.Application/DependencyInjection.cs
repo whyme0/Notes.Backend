@@ -2,7 +2,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Notes.Application.Common.Behaviours;
+using Notes.Application.Common.Behaviors;
 
 namespace Notes.Application
 {
@@ -14,6 +14,8 @@ namespace Notes.Application
             services.AddValidatorsFromAssemblies(new[] {Assembly.GetExecutingAssembly()});
             services.AddTransient(typeof(IPipelineBehavior<,>),
                 typeof(ValidationBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>),
+                typeof(LoggingBehavior<,>));
             return services;
         }
     }
