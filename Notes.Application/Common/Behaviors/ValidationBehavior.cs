@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 
-namespace Notes.Application.Common.Behaviours
+namespace Notes.Application.Common.Behaviors
 {
     // Fluent validation will work after this settings
     public class ValidationBehavior<TRequest, TResponse>
